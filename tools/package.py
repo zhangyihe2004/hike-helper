@@ -16,6 +16,8 @@ assert manifest['version'] == package_json['version'], 'Extension and project ve
 for script in manifest['content_scripts'][0]['js']:
     assert (SOURCE / script).is_file(), script
 assert (SOURCE / manifest['action']['default_popup']).is_file()
+for icon in set(manifest['icons'].values()) | set(manifest['action']['default_icon'].values()):
+    assert (SOURCE / icon).is_file(), f'Missing extension icon: {icon}'
 popup_html = (SOURCE / manifest['action']['default_popup']).read_text(encoding='utf-8')
 for asset in re.findall(r'(?:src|href)="([^"]+)"', popup_html):
     assert (SOURCE / asset).is_file(), f'Missing popup asset: {asset}'

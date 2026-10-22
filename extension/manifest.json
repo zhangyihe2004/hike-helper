@@ -3,6 +3,12 @@
   "name": "Hi课助手",
   "version": "1.0.0",
   "description": "HITSZ教学云平台课程视频助手。",
+  "icons": {
+    "16": "extension_icon16.png",
+    "32": "extension_icon32.png",
+    "48": "extension_icon48.png",
+    "128": "extension_icon128.png"
+  },
   "permissions": ["storage"],
   "content_scripts": [{
     "matches": ["https://jxypt.hitsz.edu.cn/ve/*"],
@@ -12,6 +18,12 @@
   }],
   "action": {
     "default_title": "Hi课助手",
+    "default_icon": {
+      "16": "extension_icon16.png",
+      "32": "extension_icon32.png",
+      "48": "extension_icon48.png",
+      "128": "extension_icon128.png"
+    },
     "default_popup": "popup.html"
   }
 }

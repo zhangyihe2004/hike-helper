@@ -213,6 +213,10 @@ test('manifest and popup expose a site-wide content script and one switch', () =
   assert.equal(manifest.version, packageInfo.version);
   assert.deepEqual(manifest.permissions, ['storage']);
   assert.deepEqual(manifest.content_scripts[0].matches, ['https://jxypt.hitsz.edu.cn/ve/*']);
+  assert.deepEqual(manifest.action.default_icon, manifest.icons);
+  for (const file of Object.values(manifest.icons)) {
+    assert.ok(readFileSync(new URL('../extension/' + file, import.meta.url)).length > 0);
+  }
   for (const file of manifest.content_scripts[0].js) {
     assert.ok(readFileSync(new URL('../extension/' + file, import.meta.url)).length > 0);
   }
