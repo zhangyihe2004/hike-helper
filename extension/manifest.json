@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "Hi课助手",
+  "version": "1.0.0",
+  "description": "HITSZ教学云平台课程视频助手。",
+  "permissions": ["storage"],
+  "content_scripts": [{
+    "matches": ["https://jxypt.hitsz.edu.cn/ve/*"],
+    "js": ["core.js", "content.js"],
+    "run_at": "document_start",
+    "all_frames": true
+  }],
+  "action": {
+    "default_title": "Hi课助手",
+    "default_popup": "popup.html"
+  }
+}

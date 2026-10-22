@@ -1,0 +1,98 @@
+:root {
+  color-scheme: light;
+  --platform-blue: #004b97;
+  --brand-deep: #00428a;
+  --surface: #f2f6fc;
+  --surface-card: #fff;
+  --text: #193756;
+  --text-muted: #5e6e83;
+  --border: #dce5f0;
+  --focus: #8db9ec;
+  font: 14px/1.5 "Segoe UI Variable", "Segoe UI", "Microsoft YaHei UI", sans-serif;
+  color: var(--text);
+  background: var(--surface);
+}
+
+* { box-sizing: border-box; }
+body { width: 280px; margin: 0; }
+
+header {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 92px;
+  padding: 20px 18px 32px;
+  overflow: hidden;
+  color: white;
+  background: linear-gradient(125deg, var(--brand-deep), var(--platform-blue) 65%, #0759a8);
+}
+
+header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 95% 0, #ffffff24, transparent 65%);
+  pointer-events: none;
+}
+
+/* Preserve the supplied wordmark's aspect ratio inside the brand area. */
+.brand {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 184px;
+  height: 40px;
+  margin: 0;
+}
+
+.brand__logo {
+  display: block;
+  width: 160px;
+  max-width: 100%;
+  height: auto;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+main { position: relative; margin-top: -14px; padding: 0 18px 18px; }
+
+.switch-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 64px;
+  gap: 16px;
+  padding: 17px 17px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface-card);
+  box-shadow: 0 4px 12px #163f6e12, 0 1px 2px #163f6e08;
+  cursor: pointer;
+  transition: border-color 150ms, box-shadow 150ms;
+}
+
+.switch-row:hover { border-color: #b8cce4; box-shadow: 0 5px 14px #163f6e18; }
+body[data-enabled="true"] .switch-row { border-color: #c6d9ef; }
+#status { color: var(--text-muted); font-size: 15px; font-weight: 600; letter-spacing: 0; }
+body[data-enabled="true"] #status { color: var(--platform-blue); }
+
+.switch { position: relative; flex: 0 0 48px; height: 28px; }
+.switch input { position: absolute; inset: -7px; opacity: 0; width: 62px; height: 42px; margin: 0; cursor: pointer; }
+.track { display: block; width: 48px; height: 28px; border-radius: 20px; background: #8194ab; pointer-events: none; transition: background 160ms; }
+.track::after { content: ""; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: white; box-shadow: 0 1px 3px #17395d24; transition: transform 160ms cubic-bezier(.2, .8, .2, 1); }
+input:checked + .track { background: var(--platform-blue); }
+input:checked + .track::after { transform: translateX(20px); }
+input:focus-visible + .track { outline: 3px solid var(--focus); outline-offset: 4px; }
+input:disabled + .track { opacity: .5; }
+#status[data-error="true"] { color: #a12e35; }
+
+@media (prefers-reduced-motion: reduce) {
+  .switch-row, .track, .track::after { transition: none; }
+}
+
+@media (forced-colors: active) {
+  .switch-row { border-color: ButtonText; }
+  .track { forced-color-adjust: none; background: GrayText; }
+  input:checked + .track { background: Highlight; }
+  .track::after { background: Canvas; }
+}

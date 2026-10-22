@@ -1,0 +1,11 @@
+{
+  "name": "hike-helper",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "check": "node --check extension/popup.js && node --check extension/core.js && node --check extension/content.js",
+    "package": "uv run python tools/package.py"
+  }
+}
