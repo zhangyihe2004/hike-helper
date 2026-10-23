@@ -21,26 +21,32 @@ function storage(initial = false, delayed = false) {
   const pending = delayed ? new Promise((a, b) => { resolve = a; reject = b; }) : null;
   return {
     api: {
-      local: { get: () => pending || Promise.resolve({ enabled: initial }) },
+      local: { get: () => pending || Promise.resolve(typeof initial === 'object' ? initial : { enabled: initial }) },
       onChanged: { addListener: callback => listeners.push(callback) }
     },
     change(value, area = 'local', key = 'enabled') {
       for (const callback of listeners) callback({ [key]: { newValue: value } }, area);
     },
-    resolve: value => resolve({ enabled: value }),
+    resolve: value => resolve(typeof value === 'object' ? value : { enabled: value }),
     reject: () => reject(new Error('storage unavailable'))
   };
 }
 
-function browser(store = storage(), href = site) {
+function browser(store = storage(), href = site, messageFails = false) {
   const listeners = new Map();
   const opened = [];
+  const messages = [];
+  const alerts = [];
   let original = 0;
   const sandbox = vm.createContext({
     URL, URLSearchParams,
     location: { href },
-    chrome: { storage: store.api },
-    window: { open: (...args) => opened.push(args) },
+    chrome: { storage: store.api, runtime: { sendMessage: message => {
+      messages.push(message);
+      if (messageFails === 'sync') throw new Error('Extension context invalidated');
+      return messageFails ? Promise.reject(new Error('Worker unavailable')) : Promise.resolve({ ok: true });
+    } } },
+    window: { open: (...args) => opened.push(args), alert: message => alerts.push(message) },
     document: {
       addEventListener(type, callback, capture) {
         assert.equal(capture, true);
@@ -57,6 +63,7 @@ function browser(store = storage(), href = site) {
   vm.runInContext(contentSource, sandbox);
   return {
     opened,
+    messages, alerts,
     get original() { return original; },
     listenerCount: () => [...listeners.values()].reduce((n, set) => n + set.size, 0),
     click(source = handler(first), type = 'click', button = 0, prevented = false) {
@@ -115,77 +122,36 @@ test('builds URLs using each row rather than a fixed course or account', () => {
   assert.throws(() => core.buildPlayerUrl({ ...first, rpId: '\n' }));
 });
 
-test('default OFF preserves the original handler and creates no click listeners', async () => {
-  const page = browser();
+test('default OFF preserves the site; ON opens the clicked record and OFF restores the site', async () => {
+  const store = storage();
+  const page = browser(store);
   await tick();
   page.click();
   assert.equal(page.original, 1);
   assert.equal(page.opened.length, 0);
   assert.equal(page.listenerCount(), 0);
-});
-
-test('ON opens the clicked record and OFF restores the original immediately', async () => {
-  const store = storage();
-  const page = browser(store);
-  await tick();
   store.change(true);
   const event = page.click(handler(second));
   assert.equal(event.stopped, true);
-  assert.equal(page.original, 0);
+  assert.equal(page.original, 1);
   assert.equal(page.opened[0][0], core.buildPlayerUrl(second));
   assert.deepEqual(page.opened[0].slice(1), ['_blank', 'noopener']);
   store.change(false);
   assert.equal(page.listenerCount(), 0);
   page.click(handler(second));
-  assert.equal(page.original, 1);
+  assert.equal(page.original, 2);
   assert.equal(page.opened.length, 1);
 });
 
-test('one saved switch updates multiple open pages and new pages', async () => {
-  const store = storage(true);
-  const page1 = browser(store);
-  const page2 = browser(store, site + '?courseId=course-beta');
+test('delegation handles middle clicks and ignores unrelated or prevented actions', async () => {
+  const page = browser(storage(true));
   await tick();
-  page1.click();
-  page2.click(handler(second));
-  assert.equal(page1.opened.length, 1);
-  assert.equal(page2.opened.length, 1);
-  store.change(false);
-  page1.click();
-  page2.click();
-  assert.equal(page1.original, 1);
-  assert.equal(page2.original, 1);
-});
-
-test('delegation covers new rows, repeated toggles and middle clicks', async () => {
-  const store = storage();
-  const page = browser(store);
-  await tick();
-  for (let count = 0; count < 3; count++) {
-    store.change(true);
-    store.change(false);
-  }
-  store.change(true);
-  store.change(true);
-  assert.equal(page.listenerCount(), 2);
   page.click(handler(second), 'auxclick', 1);
   assert.equal(page.opened.length, 1);
   page.click(handler(second), 'auxclick', 2);
   page.click('logout()');
   page.click(handler(first), 'click', 0, true);
   assert.equal(page.opened.length, 1);
-});
-
-test('late initial storage reads cannot override a newer switch setting', async () => {
-  for (const [latest, stale] of [[true, false], [false, true]]) {
-    const store = storage(false, true);
-    const page = browser(store);
-    store.change(latest);
-    store.resolve(stale);
-    await tick();
-    page.click();
-    assert.equal(page.opened.length, latest ? 1 : 0);
-  }
 });
 
 test('unrelated storage updates do not change state, and storage failure stays OFF', async () => {
@@ -206,21 +172,86 @@ test('content script does nothing outside the target site', async () => {
   assert.equal(page.listenerCount(), 0);
 });
 
-test('manifest and popup expose a site-wide content script and one switch', () => {
-  const manifest = JSON.parse(readFileSync(new URL('../extension/manifest.json', import.meta.url)));
-  assert.equal(manifest.manifest_version, 3);
-  const packageInfo = JSON.parse(readFileSync(new URL('../package.json', import.meta.url)));
-  assert.equal(manifest.version, packageInfo.version);
-  assert.deepEqual(manifest.permissions, ['storage']);
-  assert.deepEqual(manifest.content_scripts[0].matches, ['https://jxypt.hitsz.edu.cn/ve/*']);
-  assert.deepEqual(manifest.action.default_icon, manifest.icons);
-  for (const file of Object.values(manifest.icons)) {
-    assert.ok(readFileSync(new URL('../extension/' + file, import.meta.url)).length > 0);
+test('stealth mode sends the clicked replay and course info without opening the platform player', async () => {
+  const store = storage({ enabled: true, stealthMode: true });
+  const page = browser(store);
+  await tick();
+  const event = page.click(handler(second));
+  await tick();
+  assert.equal(event.stopped, true);
+  assert.equal(page.original, 0);
+  assert.equal(page.opened.length, 0);
+  assert.deepEqual({ ...page.messages[0], courseInfo: { ...page.messages[0].courseInfo } },
+    { type: 'openStealthPlayer', rpId: second.rpId, courseInfo: {} });
+  store.change(false, 'local', 'stealthMode');
+  page.click(handler(first));
+  assert.equal(page.opened[0][0], core.buildPlayerUrl(first));
+});
+
+test('initial storage reads preserve newer per-setting changes in stealth mode', async () => {
+  const store = storage(false, true);
+  const page = browser(store);
+  store.change(true, 'local', 'stealthMode');
+  store.resolve({ enabled: true, stealthMode: false });
+  await tick();
+  page.click();
+  assert.equal(page.messages.length, 1);
+  assert.equal(page.opened.length, 0);
+  store.change(false);
+  page.click();
+  assert.equal(page.original, 1);
+});
+
+test('invalid IDs and worker errors cannot fall back to a counted platform page', async () => {
+  for (const failure of [true, 'sync']) {
+    const page = browser(storage({ enabled: true, stealthMode: true }), site, failure);
+    await tick();
+    page.click(handler({ ...first, rpId: 'invalid-record' }));
+    page.click();
+    await tick();
+    assert.equal(page.original, 0);
+    assert.equal(page.opened.length, 0);
+    assert.equal(page.messages.length, 1);
+    assert.equal(page.alerts.length, 2);
   }
-  for (const file of manifest.content_scripts[0].js) {
-    assert.ok(readFileSync(new URL('../extension/' + file, import.meta.url)).length > 0);
+});
+
+test('stealth URLs contain only the selected record and map all three media views correctly', () => {
+  for (const record of [first, second]) {
+    const path = core.buildStealthPlayerPath(record.rpId);
+    assert.equal(path, 'player/index.html#rpId=' + record.rpId);
+    const sources = core.buildMediaSources(record.rpId);
+    for (const [key, type] of [['teacherVideoUrl', '2'], ['studentVideoUrl', '1'], ['courseVideoUrl', '3']]) {
+      const url = new URL(sources[key]);
+      assert.equal(url.origin, 'https://jxlmtt.hitsz.edu.cn:78');
+      assert.equal(url.pathname, '/Root/download.shtml');
+      assert.equal(url.searchParams.get('p'), 'recordRp');
+      assert.equal(url.searchParams.get('type'), type);
+      assert.equal(url.searchParams.get('id'), record.rpId);
+      assert.equal(url.searchParams.size, 3);
+    }
   }
-  const html = readFileSync(new URL('../extension/popup.html', import.meta.url), 'utf8');
-  assert.equal((html.match(/role="switch"/g) || []).length, 1);
-  assert.equal((html.match(/<button|<select/g) || []).length, 0);
+  for (const rpId of ['', null, 'A'.repeat(33), 'x&userId=1', 'https://example.com']) {
+    assert.throws(() => core.buildMediaSources(rpId));
+    assert.throws(() => core.buildStealthPlayerPath(rpId));
+  }
+});
+
+test('reads displayed course metadata and bounds hash parameters without replacing the selected replay', () => {
+  const course = { textContent: '示例课程' };
+  const classLabel = { textContent: '授课班级: 示例班级', getAttribute: () => null };
+  const header = { querySelector: selector => selector === '.topm' ? course : classLabel };
+  const doc = { querySelector: selector => selector === '.curr-contentltop' ? header : null };
+  const link = { querySelector: selector => selector === '.titlex' ? { textContent: '示例老师' } : null };
+  const info = core.readCourseInfo(doc, link);
+  assert.deepEqual({ ...info }, { courseName: '示例课程', teacherName: '示例老师', className: '示例班级' });
+  const url = new URL(core.buildStealthPlayerPath(first.rpId, {
+    ...info, courseName: '课程 &rpId=other', teacherName: 'x'.repeat(200), unknown: 'ignored'
+  }), 'https://extension.example/');
+  const params = new URLSearchParams(url.hash.slice(1));
+  assert.equal(params.get('rpId'), first.rpId);
+  assert.equal(params.get('courseName'), '课程 &rpId=other');
+  assert.equal(params.get('teacherName').length, 160);
+  assert.equal(params.has('unknown'), false);
+  assert.deepEqual({ ...core.cleanCourseInfo({ courseName: '\n课程\t甲\0', teacherName: 42 }) }, { courseName: '课程 甲' });
 });

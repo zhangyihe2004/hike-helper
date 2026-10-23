@@ -3,9 +3,10 @@
   const core = globalThis.HikeHelper;
   if (!core.isSitePage(location.href)) return;
   let enabled = false;
-  let revision = 0;
+  let stealthMode = false;
+  const revisions = { enabled: 0, stealthMode: 0 };
 
-  function onClick(event) {
+  async function onClick(event) {
     if (!enabled || event.defaultPrevented) return;
     if (event.type === 'click' && event.button !== 0) return;
     if (event.type === 'auxclick' && event.button !== 1) return;
@@ -14,10 +15,24 @@
     if (!link) return;
     const record = core.parseHandler(link.getAttribute('onclick'));
     if (!record) return;
-    const url = core.buildPlayerUrl(record);
     event.preventDefault();
     event.stopImmediatePropagation();
-    window.open(url, '_blank', 'noopener');
+    if (!stealthMode) {
+      window.open(core.buildPlayerUrl(record), '_blank', 'noopener');
+      return;
+    }
+    // Never fall back to the counted page if the independent player fails.
+    if (!core.isReplayId(record.rpId)) {
+      window.alert('视频编号无效。');
+      return;
+    }
+    try {
+      const result = await chrome.runtime.sendMessage({ type: 'openStealthPlayer', rpId: record.rpId,
+        courseInfo: core.readCourseInfo(document, link) });
+      if (!result?.ok) throw new Error();
+    } catch {
+      window.alert('无法打开播放器。');
+    }
   }
 
   function setEnabled(value) {
@@ -32,14 +47,17 @@
 
   // Listen before reading storage so a late initial read cannot undo a toggle.
   chrome.storage.onChanged.addListener((changes, area) => {
-    if (area !== 'local' || !Object.hasOwn(changes, 'enabled')) return;
-    revision++;
-    setEnabled(changes.enabled.newValue);
+    if (area !== 'local') return;
+    for (const key of Object.keys(revisions)) {
+      if (!Object.hasOwn(changes, key)) continue;
+      revisions[key]++;
+      if (key === 'enabled') setEnabled(changes[key].newValue);
+      else stealthMode = changes[key].newValue === true;
+    }
   });
-  const initialRevision = revision;
-  chrome.storage.local.get({ enabled: false }).then(settings => {
-    if (revision === initialRevision) setEnabled(settings.enabled);
-  }).catch(() => {
-    if (revision === initialRevision) setEnabled(false);
-  });
+  const initialRevisions = { ...revisions };
+  chrome.storage.local.get({ enabled: false, stealthMode: false }).then(settings => {
+    if (revisions.enabled === initialRevisions.enabled) setEnabled(settings.enabled);
+    if (revisions.stealthMode === initialRevisions.stealthMode) stealthMode = settings.stealthMode === true;
+  }).catch(() => {});
 })();

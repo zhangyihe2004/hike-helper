@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Hi课助手",
-  "version": "1.0.0",
+  "version": "1.1.5",
   "description": "HITSZ教学云平台课程视频助手。",
   "icons": {
     "16": "extension_icon16.png",
@@ -10,6 +10,10 @@
     "128": "extension_icon128.png"
   },
   "permissions": ["storage"],
+  "background": { "service_worker": "background.js" },
+  "content_security_policy": {
+    "extension_pages": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src https://jxlmtt.hitsz.edu.cn:78; object-src 'none'; base-uri 'none'; frame-src 'none'; form-action 'none'"
+  },
   "content_scripts": [{
     "matches": ["https://jxypt.hitsz.edu.cn/ve/*"],
     "js": ["core.js", "content.js"],

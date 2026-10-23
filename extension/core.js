@@ -50,5 +50,51 @@
     return url.href;
   }
 
-  globalThis.HikeHelper = Object.freeze({ isSitePage, parseHandler, buildPlayerUrl });
+  function isReplayId(value) {
+    return typeof value === 'string' && /^[a-f0-9]{32}$/i.test(value);
+  }
+
+  function cleanCourseInfo(input) {
+    const result = {};
+    for (const key of ['courseName', 'teacherName', 'className']) {
+      const value = typeof input?.[key] === 'string'
+        ? input[key].replace(/[\x00-\x1f\x7f]/g, ' ').trim().slice(0, 160) : '';
+      if (value) result[key] = value;
+    }
+    return result;
+  }
+
+  function readCourseInfo(doc, link) {
+    const header = doc.querySelector?.('.curr-contentltop');
+    const classLabel = header?.querySelector('.topb');
+    return cleanCourseInfo({
+      courseName: header?.querySelector('.topm')?.textContent,
+      teacherName: link.querySelector?.('.titlex')?.textContent,
+      className: classLabel?.getAttribute('title') || classLabel?.textContent.replace(/^\s*授课班级\s*[:：]\s*/, '')
+    });
+  }
+
+  function buildStealthPlayerPath(rpId, courseInfo) {
+    if (!isReplayId(rpId)) throw new Error('视频编号无效。');
+    return 'player/index.html#' + new URLSearchParams({ rpId, ...cleanCourseInfo(courseInfo) });
+  }
+
+  function buildMediaSources(rpId) {
+    if (!isReplayId(rpId)) throw new Error('视频编号无效。');
+    const mediaUrl = type => {
+      const url = new URL('https://jxlmtt.hitsz.edu.cn:78/Root/download.shtml');
+      url.search = new URLSearchParams({ p: 'recordRp', type, id: rpId });
+      return url.href;
+    };
+    return {
+      teacherVideoUrl: mediaUrl('2'),
+      studentVideoUrl: mediaUrl('1'),
+      courseVideoUrl: mediaUrl('3')
+    };
+  }
+
+  globalThis.HikeHelper = Object.freeze({
+    isSitePage, parseHandler, buildPlayerUrl, isReplayId, buildStealthPlayerPath, buildMediaSources,
+    cleanCourseInfo, readCourseInfo
+  });
 })();

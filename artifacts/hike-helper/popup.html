@@ -18,6 +18,14 @@
         <span class="track" aria-hidden="true"></span>
       </span>
     </label>
+    <label class="switch-row" for="stealthMode">
+      <span id="stealthStatus" class="option-title" role="status" aria-live="polite">隐身模式关</span>
+      <span class="switch">
+        <input id="stealthMode" type="checkbox" role="switch" aria-label="隐身模式" disabled>
+        <span class="track" aria-hidden="true"></span>
+      </span>
+    </label>
+    <p id="error" role="status" aria-live="polite" hidden></p>
   </main>
   <script type="module" src="popup.js"></script>
 </body>

@@ -1,11 +1,14 @@
 {
   "name": "hike-helper",
-  "version": "1.0.0",
+  "version": "1.1.5",
   "private": true,
   "type": "module",
   "scripts": {
     "test": "node --test test/*.test.js",
-    "check": "node --check extension/popup.js && node --check extension/core.js && node --check extension/content.js",
-    "package": "uv run python tools/package.py"
+    "check": "node --check extension/core.js && node --check extension/content.js && node --check extension/background.js && node --check extension/popup.js && node --check extension/player/media.js && node --check extension/player/boot.js && node --check extension/player/original/jydH5Player.js",
+    "build": "uv run python tools/package.py"
+  },
+  "devDependencies": {
+    "jquery": "3.7.1"
   }
 }

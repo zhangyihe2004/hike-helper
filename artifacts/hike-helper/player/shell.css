@@ -1,0 +1,112 @@
+:root {
+  --platform-blue: #004b97;
+  font-family: 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', sans-serif;
+  color-scheme: light;
+}
+html { min-height: 100%; }
+body {
+  --page-background: #fff;
+  --bar-background: #f5f7fa;
+  --bar-text: #193756;
+  --bar-muted: #5e6e83;
+  --bar-border: #dce5ef;
+  --switch-background: #e8edf4;
+  --switch-hover: #dce4ef;
+  --focus-ring: #7aade3;
+  min-height: 100vh;
+  min-height: 100dvh;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--page-background);
+  color: var(--bar-text);
+}
+body[data-background="black"] {
+  --page-background: #000;
+  --bar-background: #151b26;
+  --bar-text: #eaf0f7;
+  --bar-muted: #a8b6c9;
+  --bar-border: #293343;
+  --switch-background: #242e3f;
+  --switch-hover: #334157;
+  --focus-ring: #9dc8f5;
+  color-scheme: dark;
+}
+.topbar {
+  flex: 0 0 auto;
+  padding: 22px 24px;
+  background: var(--bar-background);
+  color: var(--bar-text);
+  border-bottom: 1px solid var(--bar-border);
+}
+/* Original host: .classcenter is 85% (min 1200px); .classright is 79%.
+   Keep its responsive width and align the header with the centered video. */
+.topbar-inner, .course-page {
+  width: max(67.15vw, 948px);
+  max-width: 100%;
+  min-width: 0;
+  margin-inline: auto;
+}
+.topbar-inner { display: flex; align-items: center; justify-content: space-between; gap: 32px; }
+.course-info { min-width: 0; }
+.course-info h1 { margin: 0; font-size: 21px; font-weight: 600; line-height: 1.4; overflow-wrap: anywhere; }
+.course-meta { display: flex; flex-wrap: wrap; gap: 4px 24px; margin-top: 7px; }
+.course-meta p { margin: 0; color: var(--bar-muted); font-size: 13px; line-height: 1.6; overflow-wrap: anywhere; }
+.theme-switch {
+  flex: 0 0 auto;
+  display: inline-flex;
+  gap: 3px;
+  margin: 0;
+  padding: 4px;
+  border: 1px solid var(--bar-border);
+  border-radius: 9px;
+  background: var(--switch-background);
+}
+.theme-option { position: relative; cursor: pointer; }
+.theme-option input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.theme-choice {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 5px;
+  color: var(--bar-muted);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.5;
+  transition: background-color 120ms, color 120ms;
+}
+.theme-choice svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.theme-option:hover .theme-choice { background: var(--switch-hover); color: var(--bar-text); }
+.theme-option input:checked + .theme-choice { background: var(--platform-blue); color: #fff; }
+.theme-option input:focus-visible + .theme-choice { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+.playback-stage { flex: 1 0 auto; min-width: 0; display: grid; grid-template-columns: minmax(0, 1fr); place-items: center; padding: 6px 24px 66px; }
+#h5PlayerId { width: 100%; }
+/* The original startup code fixes inline heights. Use its 2:1 column ratio
+   outside fullscreen so resizing the window keeps all three views aligned. */
+#h5PlayerId .jyd-videoPlayer:not(:fullscreen) .jyd-videoPart { height: auto !important; aspect-ratio: 8 / 3; }
+#h5PlayerId .jyd-videoPlayer:not(:fullscreen) .jyd-leftWrap,
+#h5PlayerId .jyd-videoPlayer:not(:fullscreen) .jyd-videoCover { height: 100% !important; }
+#h5PlayerId .jyd-videoPlayer:not(:fullscreen) .jyd-rightTopWrap,
+#h5PlayerId .jyd-videoPlayer:not(:fullscreen) .jyd-rightBottomWrap { height: 50% !important; }
+#h5PlayerId .jyd-videoPlayer:not(:fullscreen) .jyd-coverPlayBtn {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin: 0 !important;
+  transform: translate(-50%, -50%);
+}
+@media (max-width: 720px) {
+  .topbar { padding: 18px 20px; }
+  .topbar-inner { flex-wrap: wrap; gap: 16px; }
+  .course-info { flex: 1 1 100%; }
+  .course-info h1 { font-size: 19px; }
+  .course-meta { column-gap: 16px; }
+  .playback-stage { padding-inline: 20px; }
+}
+@media (prefers-reduced-motion: reduce) { .theme-choice { transition: none; } }
+@media (forced-colors: active) {
+  .theme-option input:checked + .theme-choice { background: Highlight; color: HighlightText; forced-color-adjust: none; }
+}

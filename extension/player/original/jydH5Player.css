@@ -1,0 +1,580 @@
+.jyd-videoPlayer{
+    width: 100%;
+    z-index: 5;
+}
+.jyd-videoPlayer *{
+    /*margin: 0;*/
+    /*padding: 0;*/
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    box-sizing: border-box;
+    list-style: none;
+    font-size: 14px;
+    user-select: none;
+}
+.jyd-videoPart{
+    position: relative;
+    overflow: hidden;
+    background-color: #000;
+    z-index: 50;
+}
+.jyd-videoWrap{
+    width: 100%;
+    background-color: #000;
+    cursor: pointer;
+}
+.jyd-videoWrap video{
+    width: 100%;
+}
+.jyd-videoControlBar{
+    width: 100%;
+    height: 50px;
+    background-color: #333333;
+    padding: 0 15px;
+    z-index: 100;
+    /*display: none;*/
+}
+.jyd-startAndPause{
+    display: inline-block;
+    float: left;
+    width: 22px;
+    height: 22px;
+    margin: 4px;
+    line-height: 30px;
+    margin-top: 14px;
+    color: #fff;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.jyd-startIcon{
+    background: url("img/play.png");
+    background-size: 100% 100%;
+}
+.jyd-pauseIcon{
+    background: url("img/pause.png");
+    background-size: 100% 100%;
+}
+.jyd-startAndPause:hover{
+    transform: scale(1.1);
+}
+.jyd-processBar{
+    position: relative;
+    float: left;
+    width: calc(100% - 660px);
+    height: 10px;
+    margin: 20px 20px;
+    background-color: #dbdbdb;
+    border-radius: 2px;
+    cursor: pointer;
+}
+.jyd-currentProcessBar{
+    width: 0;
+    height: 10px;
+    background-color: #004795;
+    border-radius: 2px;
+    z-index: 1002;
+}
+.jyd-roundBar{
+    width: 20px;
+    height: 20px;
+    float: right;
+    background-color: #004795;
+    position: relative;
+    top: -5px;
+    right: -10px;
+    border-radius: 10px;
+    z-index: 1005;
+}
+.jyd-roundBar:hover{
+    background-color: #1743ac;
+}
+/*.jyd-currentProcessBar:hover{*/
+/*    background-color: #1743ac;*/
+/*}*/
+.jyd-processBar:hover{
+    background-color: #e3e3e3;
+}
+.jyd-picPoint{
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: 5px;
+    background-color: #004795;
+    cursor: pointer;
+    z-index: 995;
+}
+.jyd-picPoint:hover > .jyd-picPointImg{
+    display: block;
+}
+.jyd-picPointImg{
+    display: none;
+    position: absolute;
+    bottom: 32px;
+    left: -87.5px;
+    width: 180px;
+    height: 130px;
+    background-color: #333333;
+    border-radius: 5px;
+    z-index: 99999;
+    padding: 10px;
+}
+.jyd-picPointImg > img{
+    width: 100%;
+    height: 90px;
+}
+.jyd-picPointText{
+    width: 100%;
+    height: 20px;
+    text-align: center;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: #fff;
+}
+.jyd-picCuttingBar{
+    position: absolute;
+    top: -5px;
+    height: 20px;
+    width: 2px;
+    background-color: red;
+    cursor: pointer;
+    z-index: 9999;
+}
+.jyd-picCuttingHandleUp{
+    position: absolute;
+    left: -4px;
+    top: -5px;
+    width: 10px;
+    height: 10px;
+    border: 2px solid red;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #fff;
+    z-index: 19999;
+}
+.jyd-picCuttingHandleDown{
+    position: absolute;
+    left: -4px;
+    bottom: -5px;
+    width: 10px;
+    height: 10px;
+    border: 2px solid red;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #fff;
+    z-index: 19999;
+}
+.jyd-timeUpdateNow{
+    color: #fff;
+    float: left;
+    line-height: 50px;
+    width: 58px;
+    overflow: hidden;
+}
+.jyd-splitTimeUpdate{
+    color: #fff;
+    float: left;
+    width: 5px;
+    line-height: 50px;
+    margin: 0 5px;
+}
+.jyd-timeUpdateAll{
+    color: #fff;
+    float: left;
+    line-height: 50px;
+    width: 58px;
+    overflow: hidden;
+}
+.jyd-radioShift{
+    position: relative;
+    margin-right: 10px;
+    display: inline-block;
+    float: right;
+    text-align: center;
+    width: 120px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    line-height: 30px;
+    margin-top: 10px;
+    background-color: #004795;
+    color: #fff;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.jyd-radioShift:hover{
+    background-color: #1743ac;
+}
+.jyd-playSpeed{
+    position: relative;
+    margin-right: 10px;
+    display: inline-block;
+    float: right;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    width: 120px;
+    text-align: center;
+    line-height: 30px;
+    margin-top: 10px;
+    background-color: #004795;
+    color: #fff;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.jyd-playSpeed:hover{
+    background-color: #1743ac;
+}
+.jyd-fullScreen{
+    display: inline-block;
+    float: right;
+    width: 22px;
+    height: 22px;
+    margin: 4px;
+    line-height: 30px;
+    margin-top: 14px;
+    color: #fff;
+    border-radius: 2px;
+    cursor: pointer;
+    background: url("img/fullscreen.png");
+    background-size: 100% 100%;
+}
+.jyd-fullScreen:hover{
+    transform: scale(1.1);
+}
+.jyd-exitFullScreen{
+    display: none;
+    float: right;
+    width: 22px;
+    height: 22px;
+    margin: 4px;
+    line-height: 30px;
+    margin-top: 14px;
+    color: #fff;
+    border-radius: 2px;
+    cursor: pointer;
+    background: url("img/exitFullScreen.png");
+    background-size: 100% 100%;
+}
+.jyd-exitFullScreen:hover{
+    transform: scale(1.1);
+}
+.jyd-radioShiftBox{
+    display: none;
+    position: absolute;
+    left: 0;
+    bottom: 32px;
+    width: 100%;
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.8);
+    z-index: 999999;
+}
+.jyd-radioShiftBox > div{
+    width: 100%;
+    height: 30px;
+    text-align: center;
+    line-height: 30px;
+    color: #004795;
+    background: transparent;
+    cursor: pointer;
+    border-radius: 5px;
+}
+.jyd-radioShiftBox > div:hover{
+    color: #fff;
+    background-color: #004795;
+}
+.jyd-speedShiftBox{
+    display: none;
+    position: absolute;
+    left: 0;
+    bottom: 32px;
+    width: 100%;
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.8);
+    z-index: 999999;
+}
+.jyd-speedShiftBox > div{
+    width: 100%;
+    height: 30px;
+    text-align: center;
+    line-height: 30px;
+    color: #004795;
+    background: transparent;
+    cursor: pointer;
+    border-radius: 5px;
+}
+.jyd-speedShiftBox > div:hover{
+    color: #fff;
+    background-color: #004795;
+}
+.jyd-volumeBar{
+    position: relative;
+    float: right;
+    width: 100px;
+    height: 10px;
+    margin: 20px 15px;
+    background-color: #dbdbdb;
+    border-radius: 2px;
+    cursor: pointer;
+}
+.jyd-currentVolumeBar{
+    width: 100px;
+    height: 10px;
+    background-color: #004795;
+    border-radius: 2px;
+}
+.jyd-volumeRoundBar{
+    width: 20px;
+    height: 20px;
+    float: right;
+    background-color: #004795;
+    position: relative;
+    top: -5px;
+    right: -10px;
+    border-radius: 10px;
+}
+.jyd-volumeRoundBar:hover{
+    background-color: #1743ac;
+}
+.jyd-processBarTimeInfo{
+    width: 80px;
+    height: 30px;
+    text-align: center;
+    line-height: 30px;
+    float: right;
+    position: relative;
+    color: #004795;
+    top: -35px;
+    right: -30px;
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.8);
+    z-index: 1000002;
+    display: none;
+}
+.jyd-currentVolumeBar:hover{
+    background-color: #1743ac;
+}
+.jyd-volumeBar:hover{
+    background-color: #e3e3e3;
+}
+.jyd-muteBtn{
+    display: inline-block;
+    float: right;
+    width: 22px;
+    height: 22px;
+    margin: 4px;
+    line-height: 30px;
+    margin-top: 14px;
+    color: #fff;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.jyd-unMuteIcon{
+    background: url("img/sound.png");
+    background-size: 100% 100%;
+}
+.jyd-muteIcon{
+    background: url("img/soundClose.png");
+    background-size: 100% 100%;
+}
+.jyd-muteBtn:hover{
+    transform: scale(1.1);
+}
+.jyd-videoCover{
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+    opacity: 0.5;
+    z-index: 999;
+}
+.jyd-coverPlayBtn{
+    width: 100px;
+    height: 100px;
+    margin: 100px auto 0;
+    cursor: pointer;
+    background: url("img/coverPlay.png") no-repeat;
+    background-size: 100% 100%;
+}
+.jyd-videoWaitingCover{
+    display: none;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+    opacity: 0.5;
+    z-index: 996;
+}
+.jyd-coverWaitingBtn{
+    width: 100px;
+    height: 100px;
+    margin: calc(28% - 50px) auto 0;
+    color: #fff;
+    text-align: center;
+}
+.jyd-coverWaitingIcon{
+    width: 30px;
+    height: 30px;
+    margin: 0 auto;
+    background: url("img/loading.gif") no-repeat;
+    background-size: 100% 100%;
+}
+.jyd-coverWaitingText{
+    font-size: 30px;
+    text-align: center;
+    height: 45px;
+    line-height: 45px;
+}
+.jyd-coverWaitingBufferSpeed{
+    text-align: center;
+    height: 25px;
+    line-height: 25px;
+}
+
+/*三画面*/
+.jyd-leftWrap{
+    width: 66.67%;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+.jyd-rightTopWrap{
+    width: 33.33%;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+.jyd-rightBottomWrap{
+    width: 33.33%;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+}
+
+/*两画面*/
+.jyd-leftWrap-doubleScreen{
+    width: 50%;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+.jyd-rightWrap-doubleScreen{
+    width: 50%;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+/*单画面*/
+.jyd-Wrap-singleScreen{
+    width: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+/*隐藏全屏控件*/
+video::-webkit-media-controls{
+    display:none !important;
+}
+
+/*新打点*/
+.jyd-newPicBox{
+    position: relative;
+    width: 100%;
+    height: 100px;
+    overflow: hidden;
+    background-color: #000;
+    z-index: 120;
+}
+.jyd-newPicMiddleBox{
+    position: relative;
+    width: 100%;
+    height: 100px;
+    overflow: hidden;
+}
+.jyd-newPicInnerBox{
+    width: fit-content;
+    height: 100px;
+    white-space: nowrap;
+}
+.jyd-newPicInfoItem{
+    position: relative;
+    display: inline-block;
+    width: 170px;
+    height: 100px;
+    background-color: #333333;
+    border-radius: 5px;
+    z-index: 0;
+    padding: 5px;
+    cursor: pointer;
+}
+.jyd-newPicInfoItem:hover{
+    background-color: #004795;
+}
+.jyd-newPicInfoItem > img{
+    width: 100%;
+    height: 100%;
+}
+.onselectPic{
+    background-color: #004795;
+}
+.jyd-newPicInfoText{
+    width: 150px;
+    word-break: break-all;
+    overflow: hidden;
+    white-space: normal;
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    color: #fff;
+    text-shadow: 1px 1px 1px #000;
+}
+.jyd-newPicLeftBtn{
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100px;
+    width: 30px;
+    line-height: 100px;
+    text-align: center;
+    background-color: #004795;
+    color: #fff;
+    opacity: 0.1;
+    z-index: 992995;
+    cursor: pointer;
+}
+.jyd-newPicLeftBtn:hover{
+    opacity: 0.5;
+}
+.jyd-newPicRightBtn{
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100px;
+    width: 30px;
+    line-height: 100px;
+    text-align: center;
+    background-color: #004795;
+    color: #fff;
+    opacity: 0.1;
+    z-index: 992995;
+    cursor: pointer;
+}
+.jyd-newPicRightBtn:hover{
+    opacity: 0.5;
+}
+
+.jyd-videoPlayerCover{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 99;
+    display: none;
+}

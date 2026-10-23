@@ -8,6 +8,7 @@
   --text-muted: #5e6e83;
   --border: #dce5f0;
   --focus: #8db9ec;
+  --stealth-purple: #7c3aed;
   font: 14px/1.5 "Segoe UI Variable", "Segoe UI", "Microsoft YaHei UI", sans-serif;
   color: var(--text);
   background: var(--surface);
@@ -54,7 +55,7 @@ header::before {
   object-fit: contain;
 }
 
-main { position: relative; margin-top: -14px; padding: 0 18px 18px; }
+main { position: relative; display: grid; gap: 10px; margin-top: -14px; padding: 0 18px 18px; }
 
 .switch-row {
   display: flex;
@@ -73,7 +74,11 @@ main { position: relative; margin-top: -14px; padding: 0 18px 18px; }
 
 .switch-row:hover { border-color: #b8cce4; box-shadow: 0 5px 14px #163f6e18; }
 body[data-enabled="true"] .switch-row { border-color: #c6d9ef; }
-#status { color: var(--text-muted); font-size: 15px; font-weight: 600; letter-spacing: 0; }
+#status, .option-title { color: var(--text-muted); font-size: 15px; font-weight: 600; }
+body[data-stealth="true"] .option-title { color: var(--stealth-purple); }
+label[for="stealthMode"]:has(input:disabled) .option-title { opacity: .5; }
+body[data-stealth="true"] .switch-row[for="stealthMode"] { border-color: #e2d6f7; }
+#error { margin: 0; color: #a12e35; font-size: 12px; }
 body[data-enabled="true"] #status { color: var(--platform-blue); }
 
 .switch { position: relative; flex: 0 0 48px; height: 28px; }
@@ -81,10 +86,11 @@ body[data-enabled="true"] #status { color: var(--platform-blue); }
 .track { display: block; width: 48px; height: 28px; border-radius: 20px; background: #8194ab; pointer-events: none; transition: background 160ms; }
 .track::after { content: ""; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: white; box-shadow: 0 1px 3px #17395d24; transition: transform 160ms cubic-bezier(.2, .8, .2, 1); }
 input:checked + .track { background: var(--platform-blue); }
+#stealthMode:checked + .track { background: var(--stealth-purple); }
 input:checked + .track::after { transform: translateX(20px); }
 input:focus-visible + .track { outline: 3px solid var(--focus); outline-offset: 4px; }
+#stealthMode:checked:focus-visible + .track { outline-color: #c4b5fd; }
 input:disabled + .track { opacity: .5; }
-#status[data-error="true"] { color: #a12e35; }
 
 @media (prefers-reduced-motion: reduce) {
   .switch-row, .track, .track::after { transition: none; }
@@ -93,6 +99,6 @@ input:disabled + .track { opacity: .5; }
 @media (forced-colors: active) {
   .switch-row { border-color: ButtonText; }
   .track { forced-color-adjust: none; background: GrayText; }
-  input:checked + .track { background: Highlight; }
+  input:checked + .track, #stealthMode:checked + .track { background: Highlight; }
   .track::after { background: Canvas; }
 }
