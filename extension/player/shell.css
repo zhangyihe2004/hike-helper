@@ -34,16 +34,15 @@ body[data-background="black"] {
 }
 .topbar {
   flex: 0 0 auto;
-  padding: 22px 24px;
+  padding: 22px 0;
   background: var(--bar-background);
   color: var(--bar-text);
   border-bottom: 1px solid var(--bar-border);
 }
 /* Original host: .classcenter is 85% (min 1200px); .classright is 79%.
-   Keep its responsive width and align the header with the centered video. */
+   Use the same page-relative width and minimum, centered without a width cap. */
 .topbar-inner, .course-page {
-  width: max(67.15vw, 948px);
-  max-width: 100%;
+  width: max(67.15%, 948px);
   min-width: 0;
   margin-inline: auto;
 }
@@ -82,7 +81,7 @@ body[data-background="black"] {
 .theme-option:hover .theme-choice { background: var(--switch-hover); color: var(--bar-text); }
 .theme-option input:checked + .theme-choice { background: var(--platform-blue); color: #fff; }
 .theme-option input:focus-visible + .theme-choice { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
-.playback-stage { flex: 1 0 auto; min-width: 0; display: grid; grid-template-columns: minmax(0, 1fr); place-items: center; padding: 6px 24px 66px; }
+.playback-stage { flex: 1 0 auto; min-width: 0; display: grid; grid-template-columns: minmax(0, 1fr); align-items: center; padding: 6px 0 66px; }
 #h5PlayerId { width: 100%; }
 /* The original startup code fixes inline heights. Use its 2:1 column ratio
    outside fullscreen so resizing the window keeps all three views aligned. */
@@ -99,12 +98,11 @@ body[data-background="black"] {
   transform: translate(-50%, -50%);
 }
 @media (max-width: 720px) {
-  .topbar { padding: 18px 20px; }
+  .topbar { padding: 18px 0; }
   .topbar-inner { flex-wrap: wrap; gap: 16px; }
   .course-info { flex: 1 1 100%; }
   .course-info h1 { font-size: 19px; }
   .course-meta { column-gap: 16px; }
-  .playback-stage { padding-inline: 20px; }
 }
 @media (prefers-reduced-motion: reduce) { .theme-choice { transition: none; } }
 @media (forced-colors: active) {
